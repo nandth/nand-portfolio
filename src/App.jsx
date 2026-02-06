@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ChromaGrid from './components/ChromaGrid/ChromaGrid';
+import Grainient from './components/Grainient/Grainient';
 
 const projects = [];
 
@@ -283,8 +284,32 @@ function App() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0b0d10] text-[#f2f4f7]">
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,rgba(122,208,255,0.08),transparent_45%),radial-gradient(circle_at_30%_80%,rgba(122,208,255,0.04),transparent_55%),linear-gradient(120deg,rgba(255,255,255,0.03),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[length:42px_42px] opacity-60" />
+      <div className="pointer-events-none absolute inset-0 -z-30">
+        <Grainient
+          color1="#09131a"
+          color2="#293542"
+          color3="#96a0a3"
+          timeSpeed={0.25}
+          colorBalance={0}
+          warpStrength={1}
+          warpFrequency={5}
+          warpSpeed={2}
+          warpAmplitude={50}
+          blendAngle={0}
+          blendSoftness={0.05}
+          rotationAmount={500}
+          noiseScale={2}
+          grainAmount={0.1}
+          grainScale={2}
+          grainAnimated={false}
+          contrast={1.5}
+          gamma={1}
+          saturation={1}
+          centerX={0}
+          centerY={0}
+          zoom={0.9}
+        />
+      </div>
 
       <CommandPalette
         open={paletteOpen}
