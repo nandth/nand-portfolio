@@ -57,24 +57,6 @@ const links = {
 };
 
 
-const principles = [
-  {
-    title: 'Reliable by default',
-    description:
-      'I like software that holds up under the boring parts: validation, retries, rate limits, and test coverage.',
-  },
-  {
-    title: 'Fast to understand',
-    description:
-      'Good interfaces and APIs should explain themselves quickly. I optimize for clean structure and low friction.',
-  },
-  {
-    title: 'Built with restraint',
-    description:
-      'I keep the moving parts that earn their place and cut the ones that only add noise.',
-  },
-];
-
 // ─── hooks ─────────────────────────────────────────────────────────────────
 
 function useReveal(threshold = 0.1) {
@@ -393,22 +375,6 @@ function ProjectCard({ project, className = '', delay = 0 }) {
   );
 }
 
-// ─── PrincipleCard ─────────────────────────────────────────────────────────
-
-function PrincipleCard({ item, delay = 0 }) {
-  const [ref, on] = useReveal(0.1);
-  return (
-    <article
-      ref={ref}
-      className={`principle-card reveal-up ${on ? 'revealed' : ''}`.trim()}
-      style={{ transitionDelay: on ? `${delay}ms` : '0ms' }}
-    >
-      <h3 className="text-base font-medium text-primary">{item.title}</h3>
-      <p className="max-w-[32ch] text-sm leading-7 text-primary/65">{item.description}</p>
-    </article>
-  );
-}
-
 // ─── App ───────────────────────────────────────────────────────────────────
 
 const BG_SPEED = 255 / 20; // faster black/white toggle
@@ -500,8 +466,7 @@ function App() {
                 Resume
               </button>
               <a href="#projects" className="transition hover:text-primary">Projects</a>
-              <a href="#about" className="transition hover:text-primary">About</a>
-              <NavLink href={links.github} tooltip="github.com/nandth" external>GitHub</NavLink>
+<NavLink href={links.github} tooltip="github.com/nandth" external>GitHub</NavLink>
               <NavLink href={links.linkedin} tooltip="linkedin.com/in/nand-thaker" external>LinkedIn</NavLink>
               <ThemeButton onClick={toggleTheme} isLight={isLight} />
             </nav>
@@ -533,15 +498,14 @@ function App() {
 
                 <BlurReveal triggerOnMount delay={820}>
                   <p className="max-w-[30rem] text-balance text-lg leading-8 text-primary/82 md:text-[1.35rem] md:leading-9">
-                    I build full-stack systems that feel quiet, fast, and dependable.
+                    CS @ UWindsor
                   </p>
                 </BlurReveal>
               </div>
 
               <BlurReveal triggerOnMount delay={1080}>
                 <p className="max-w-[38rem] text-base leading-8 text-primary/62">
-                  Computer Science student at the University of Windsor, focused on backend-heavy
-                  products, thoughtful frontends, and the details that make software hold together.
+                  I'm a second year student in Computer Science. Most of my time outside class goes into making beats, building things, or playing video games. I'm a dual citizen (Canada/US) and don't need sponsorship. Open to internships and co-ops in backend or full-stack roles.
                 </p>
               </BlurReveal>
 
@@ -600,32 +564,6 @@ function App() {
               </div>
             </section>
 
-            <div className="hairline" />
-
-            {/* About */}
-            <section
-              id="about"
-              className="grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12"
-            >
-              <BlurReveal className="grid gap-5">
-                <SectionLabel>About</SectionLabel>
-                <h2 className="max-w-[12ch] text-balance text-3xl font-medium tracking-[-0.04em] text-primary md:text-5xl">
-                  Calm surface, serious internals.
-                </h2>
-                <p className="max-w-[38rem] text-base leading-8 text-primary/65">
-                  I'm a first year student in Computer Science. 
-                  Most of my time outside class goes into making beats, building things, or playing video games.
-                  I'm a dual citizen (Canada/US) and don't need sponsorship. 
-                  Open to internships and co-ops in backend or full-stack roles.
-                </p>
-              </BlurReveal>
-
-              <div className="grid gap-4">
-                {principles.map((item, index) => (
-                  <PrincipleCard key={item.title} item={item} delay={index * 90} />
-                ))}
-              </div>
-            </section>
           </main>
 
           <footer className="mt-16 flex flex-col gap-5 border-t pt-6 text-sm text-primary/48 md:mt-20 md:flex-row md:items-center md:justify-between"
