@@ -486,7 +486,7 @@ function App() {
               href="#top"
               className="logo-glow font-['Abril_Fatface',_serif] text-[1.6rem] not-italic tracking-[0.01em] text-primary"
             >
-              nand.xyz
+              nandth.xyz
             </a>
             <nav
               aria-label="Primary"
