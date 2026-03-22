@@ -1,560 +1,342 @@
-import React, { useState } from 'react';
-import ChromaGrid from './components/ChromaGrid/ChromaGrid';
 import Grainient from './components/Grainient/Grainient';
+import MiniBeatPlayer from './components/MiniBeatPlayer';
 
-const projects = [];
-
-const projectTemplate = {
-  title: 'AI Model Router',
-  problem:
-    'Routing every prompt to a single LLM is inefficient, costly, and often overkill for simple tasks.',
-  stack: [
-    'Python',
-    'FastAPI',
-    'OpenAI API',
-    'Rule-based heuristics',
-    'React + Vite',
-    'JavaScript',
-  ],
-  context:
-    'Built to explore systems-level decision making in AI applications, where cost, latency, and capability must be balanced dynamically rather than hard-coded to one model.',
-  constraints: [
-    'No fine-tuned classifier model (had to rely on lightweight heuristics)',
-    'Low-latency routing required before inference',
-    'Must remain extensible to new models without refactoring core logic',
-  ],
-  decisions: [
-    'Used a pre-routing evaluation step to score prompts on complexity instead of embedding-based similarity',
-    'Abstracted model providers behind a common interface to avoid vendor lock-in',
-  ],
-  outcome:
-    'Successfully routed prompts to different models based on complexity, reducing average cost per request while preserving response quality.',
-};
-
-const techStack = [
-  { category: 'Languages', items: ['Python', 'Java', 'C', 'JavaScript'] },
+const projects = [
   {
-    category: 'Frameworks',
-    items: ['React', 'Next.js', 'Astro', 'FastAPI', 'Node.js'],
+    id: '01',
+    title: 'Cost-Aware LLM Router',
+    problem:
+      'Routes requests across model tiers using prompt complexity scoring, confidence checks, and fail-closed parsing.',
+    stack: ['Python', 'FastAPI', 'Pydantic', 'React', 'Vite', 'TailwindCSS'],
+    github: 'https://github.com/nandth/model-router-ai',
+    demo: 'https://model-router-ai-five.vercel.app/',
+    featured: true,
   },
-  { category: 'UI + Motion', items: ['Tailwind', 'Radix UI'] },
-  { category: 'Tooling', items: ['Vite', 'Storybook', 'Playwright'] },
+  {
+    id: '02',
+    title: 'Broccolli URL Shortener',
+    problem:
+      'Full-stack short-link service with deterministic IDs, analytics, and a restrained WebGL front end.',
+    stack: ['React', 'Vite', 'TailwindCSS', 'Express', 'PostgreSQL', 'OGL'],
+    github: 'https://github.com/notaarryan/broccolli-url-shortener',
+    demo: null,
+  },
+  {
+    id: '03',
+    title: 'Math Game',
+    problem:
+      'Java quiz engine with multiple game modes built on a shared interface and event-driven desktop UI.',
+    stack: ['Java', 'Swing', 'OOP'],
+    github: 'https://github.com/nandth/kids-game-java',
+    demo: null,
+  },
+  {
+    id: '04',
+    title: 'Macro Recorder',
+    problem:
+      'Desktop automation tool that records keyboard and mouse actions and replays them from readable JSON.',
+    stack: ['Python', 'customtkinter', 'pynput', 'JSON'],
+    github: 'https://github.com/nandth/macro-recorder',
+    demo: null,
+  },
 ];
 
-const highlights = [
+const links = {
+  github: 'https://github.com/nandth',
+  linkedin: 'https://www.linkedin.com/in/nand-thaker-b919482aa/',
+  email: 'thaker31@uwindsor.ca',
+};
+
+const heroMeta = [
   {
-    label: 'Now',
-    text: 'Designing systems that reduce operational entropy and make engineering work feel calm.',
+    label: 'Based in',
+    value: 'Windsor, Ontario',
   },
   {
     label: 'Focus',
-    text: 'Frontend architecture, interaction design, and tooling that enforces consistency.',
+    value: 'Full-stack systems, backend reliability, and careful interfaces',
   },
   {
-    label: 'Tooling',
-    text: 'React, Vite, Next.js, Astro, Tailwind, Framer Motion, Playwright.',
+    label: 'Currently',
+    value: 'Computer Science, Software Engineering specialization at the University of Windsor',
   },
 ];
 
-const placeholderImage =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%25' height='100%25' fill='%2310161f'/><circle cx='140' cy='140' r='90' fill='%237ad0ff' opacity='0.25'/><text x='50%25' y='50%25' fill='%23ffffff' font-size='30' font-family='Arial' text-anchor='middle' dominant-baseline='middle'>Add preview</text></svg>";
-
-const chromaItems = [
+const principles = [
   {
-    image: placeholderImage,
-    title: 'Case Study Slot',
-    subtitle: 'Replace with a real project card',
-    handle: 'Template',
-    borderColor: '#7ad0ff',
-    gradient: 'linear-gradient(145deg, #7ad0ff, #10161f)',
-    url: '#projects',
+    title: 'Reliable by default',
+    description:
+      'I like software that holds up under the boring parts: validation, retries, rate limits, and test coverage.',
   },
   {
-    image: placeholderImage,
-    title: 'Experiment',
-    subtitle: 'Prototype or side project highlight',
-    handle: 'Template',
-    borderColor: '#9b7dff',
-    gradient: 'linear-gradient(145deg, #9b7dff, #10161f)',
-    url: '#projects',
+    title: 'Fast to understand',
+    description:
+      'Good interfaces and APIs should explain themselves quickly. I optimize for clean structure and low friction.',
   },
   {
-    image: placeholderImage,
-    title: 'Product Launch',
-    subtitle: 'Narrate an end-to-end build',
-    handle: 'Template',
-    borderColor: '#7dd6ff',
-    gradient: 'linear-gradient(145deg, #7dd6ff, #0f141d)',
-    url: '#projects',
-  },
-  {
-    image: placeholderImage,
-    title: 'System Upgrade',
-    subtitle: 'Show infra or architecture improvements',
-    handle: 'Template',
-    borderColor: '#86e1b6',
-    gradient: 'linear-gradient(145deg, #86e1b6, #0f141d)',
-    url: '#projects',
+    title: 'Built with restraint',
+    description:
+      'I keep the moving parts that earn their place and cut the ones that only add noise.',
   },
 ];
 
-const ghostButton =
-  'rounded-full border border-white/15 px-4 py-2 text-sm text-white transition hover:border-[#7ad0ff]/60 hover:bg-[#7ad0ff]/10 hover:text-[#7ad0ff]';
-
-const primaryButton =
-  'inline-flex items-center gap-2 rounded-full border border-[#7ad0ff]/50 bg-[#7ad0ff]/20 px-5 py-2.5 text-sm font-semibold text-[#7ad0ff] transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(122,208,255,0.18)]';
-
-function Badge({ label }) {
-  return (
-    <span className="rounded-full border border-[#7ad0ff]/30 bg-[#7ad0ff]/10 px-3 py-1 text-xs font-medium text-[#7ad0ff]">
-      {label}
-    </span>
-  );
+function SectionLabel({ children }) {
+  return <p className="section-label">{children}</p>;
 }
 
-function ProjectCard({ project, onOpen, disabled = false, label = 'Case Study' }) {
+function InfoPanel() {
   return (
-    <button
-      type="button"
-      className={`grid gap-4 rounded-2xl border border-white/10 bg-[#161b23]/90 p-6 text-left shadow-[0_20px_45px_rgba(0,0,0,0.4)] transition ${
-        disabled
-          ? 'cursor-default opacity-70'
-          : 'hover:-translate-y-1 hover:border-[#7ad0ff]/60'
-      }`}
-      onClick={() => onOpen(project)}
-      disabled={disabled}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="font-['Space_Grotesk',_sans-serif] text-xl text-white">
-          {project.title}
-        </h3>
-        <span className="text-[11px] uppercase tracking-[0.12em] text-white/50">
-          {label}
-        </span>
+    <aside className="glass-panel intro-reveal stagger-2 flex flex-col gap-6 p-6 md:p-7">
+      <div className="flex items-center justify-between">
+        <SectionLabel>Snapshot</SectionLabel>
+        <span className="soft-pill">Open to internships</span>
       </div>
-      <p className="text-sm text-white">{project.problem}</p>
-      <div className="flex flex-wrap gap-2">
-        {project.stack.map((item) => (
-          <Badge key={item} label={item} />
+
+      <div className="grid gap-5">
+        {heroMeta.map((item) => (
+          <div key={item.label} className="grid gap-1.5">
+            <p className="text-[0.7rem] uppercase tracking-[0.24em] text-primary/40">
+              {item.label}
+            </p>
+            <p className="max-w-[34ch] text-sm leading-6 text-primary/78">
+              {item.value}
+            </p>
+          </div>
         ))}
       </div>
-      <div className="text-xs text-white/50">View details</div>
-    </button>
+
+      <div className="hairline" />
+
+      <p className="max-w-[32ch] text-sm leading-6 text-primary/58">
+        Resume available on request. The best starting point is the code.
+      </p>
+    </aside>
   );
 }
 
-function ProjectDrawer({ project, onClose }) {
+function ProjectCard({ project, className = '', delayClass = '' }) {
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur">
-      <div className="max-h-[85vh] w-[min(860px,90vw)] overflow-auto rounded-[24px] border border-[#7ad0ff]/20 bg-[#0a0c10]/95 p-7 text-white shadow-[0_40px_90px_rgba(0,0,0,0.55)]">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-6">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">
-              Project Detail
-            </p>
-            <h2 className="font-['Space_Grotesk',_sans-serif] text-3xl">
-              {project.title}
-            </h2>
-          </div>
-          <button type="button" className={ghostButton} onClick={onClose}>
-            Close
-          </button>
-        </div>
-        <div className="grid gap-6 text-sm text-white/70">
-          <section className="grid gap-2">
-            <h4 className="font-['Space_Grotesk',_sans-serif] text-lg text-white">
-              Context
-            </h4>
-            <p>{project.context}</p>
-          </section>
-          <section className="grid gap-2">
-            <h4 className="font-['Space_Grotesk',_sans-serif] text-lg text-white">
-              Constraints
-            </h4>
-            <ul className="grid gap-1 pl-5 text-white/70">
-              {project.constraints.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-          <section className="grid gap-2">
-            <h4 className="font-['Space_Grotesk',_sans-serif] text-lg text-white">
-              Key Decisions
-            </h4>
-            <ul className="grid gap-1 pl-5 text-white/70">
-              {project.decisions.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-          <section className="grid gap-2">
-            <h4 className="font-['Space_Grotesk',_sans-serif] text-lg text-white">
-              Outcome
-            </h4>
-            <p>{project.outcome}</p>
-          </section>
-          <section className="grid gap-3">
-            <h4 className="font-['Space_Grotesk',_sans-serif] text-lg text-white">
-              Architecture Snapshot
-            </h4>
-            <div className="grid gap-3">
-              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center text-sm text-white">
-                Client UI
-              </div>
-              <div className="h-px bg-[#7ad0ff]/30" />
-              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center text-sm text-white">
-                Static Index
-              </div>
-              <div className="h-px bg-[#7ad0ff]/30" />
-              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-center text-sm text-white">
-                Audit Modules
-              </div>
-            </div>
-          </section>
-        </div>
+    <article
+      className={`project-card intro-reveal ${delayClass} ${
+        project.featured ? 'project-card-featured' : ''
+      } ${className}`.trim()}
+    >
+      <div className="flex items-start justify-between gap-6">
+        <p className="text-[0.72rem] uppercase tracking-[0.28em] text-primary/36">
+          {project.id}
+        </p>
+        <div className="soft-pill shrink-0">{project.featured ? 'Featured' : 'Selected'}</div>
       </div>
-    </div>
+
+      <div className="mt-8 grid gap-4">
+        <h3 className="project-title max-w-[16ch] text-balance font-medium text-primary">
+          {project.title}
+        </h3>
+        <p className="max-w-[34ch] text-sm leading-7 text-primary/68">
+          {project.problem}
+        </p>
+      </div>
+
+      <p className="mt-8 max-w-[42ch] text-xs uppercase tracking-[0.18em] text-primary/40">
+        {project.stack.join(' / ')}
+      </p>
+
+      <div className="mt-auto flex flex-wrap gap-5 pt-10 text-sm text-primary/70">
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 transition hover:text-primary"
+        >
+          GitHub
+          <span aria-hidden="true">/</span>
+        </a>
+        {project.demo && (
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 transition hover:text-primary"
+          >
+            Live demo
+            <span aria-hidden="true">/</span>
+          </a>
+        )}
+      </div>
+    </article>
   );
 }
 
-function CommandPalette({ open, onClose, onSelect }) {
-  const commands = [
-    { label: 'Jump to Projects', target: '#projects' },
-    { label: 'Jump to Tech Stack', target: '#stack' },
-    { label: 'Jump to About', target: '#about' },
-    { label: 'Open Resume', target: '#resume' },
-  ];
-
-  if (!open) return null;
-
+function PrincipleCard({ item, delayClass = '' }) {
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center bg-black/70 backdrop-blur">
-      <div className="grid w-[min(480px,90vw)] gap-4 rounded-[22px] border border-[#7ad0ff]/20 bg-[#0a0c10]/95 p-5 shadow-[0_40px_90px_rgba(0,0,0,0.55)]">
-        <div className="flex items-center justify-between text-white/60">
-          <p>Command Palette</p>
-          <button type="button" className={ghostButton} onClick={onClose}>
-            Esc
-          </button>
-        </div>
-        <div className="grid gap-2">
-          {commands.map((cmd) => (
-            <button
-              key={cmd.target}
-              type="button"
-              className="rounded-xl border border-transparent bg-[#7ad0ff]/10 px-4 py-3 text-left text-sm text-white transition hover:border-[#7ad0ff]/60"
-              onClick={() => onSelect(cmd.target)}
-            >
-              {cmd.label}
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-white/50">Press Cmd+K / Ctrl+K to open</p>
-      </div>
-    </div>
+    <article className={`principle-card intro-reveal ${delayClass}`.trim()}>
+      <h3 className="text-lg font-medium text-primary">{item.title}</h3>
+      <p className="max-w-[32ch] text-sm leading-7 text-primary/64">{item.description}</p>
+    </article>
   );
 }
 
 function App() {
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-
-  const paletteHandler = (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-      event.preventDefault();
-      setPaletteOpen((prev) => !prev);
-    }
-    if (event.key === 'Escape') {
-      setPaletteOpen(false);
-      setSelectedProject(null);
-    }
-  };
-
-  React.useEffect(() => {
-    window.addEventListener('keydown', paletteHandler);
-    return () => window.removeEventListener('keydown', paletteHandler);
-  }, []);
-
-  const openPaletteTarget = (target) => {
-    setPaletteOpen(false);
-    const element = document.querySelector(target);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0b0d10] text-[#f2f4f7]">
-      <div className="pointer-events-none absolute inset-0 -z-30">
+    <div className="site-shell text-primary">
+      <div className="pointer-events-none fixed inset-0 -z-30">
         <Grainient
-          color1="#09131a"
-          color2="#293542"
-          color3="#96a0a3"
-          timeSpeed={0.25}
+          color1="#d8ddd8"
+          color2="#1e2124"
+          color3="#050506"
+          timeSpeed={0.3}
           colorBalance={0}
-          warpStrength={1}
-          warpFrequency={5}
-          warpSpeed={2}
-          warpAmplitude={50}
-          blendAngle={0}
+          warpStrength={1.25}
+          warpFrequency={8.2}
+          warpSpeed={0.45}
+          warpAmplitude={55}
+          blendAngle={20}
           blendSoftness={0.05}
-          rotationAmount={500}
-          noiseScale={2}
-          grainAmount={0.1}
-          grainScale={2}
+          rotationAmount={180}
+          noiseScale={1.3}
+          grainAmount={0.08}
+          grainScale={2.2}
           grainAnimated={false}
-          contrast={1.5}
+          contrast={1.28}
           gamma={1}
-          saturation={1}
-          centerX={0}
-          centerY={0}
-          zoom={0.9}
+          saturation={0.48}
+          centerX={0.04}
+          centerY={-0.08}
+          zoom={0.92}
         />
       </div>
 
-      <CommandPalette
-        open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        onSelect={openPaletteTarget}
-      />
-      {selectedProject && (
-        <ProjectDrawer
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
+      <div className="pointer-events-none fixed inset-0 -z-20 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.10),transparent_22%),radial-gradient(circle_at_12%_18%,rgba(255,255,255,0.07),transparent_18%),linear-gradient(180deg,rgba(4,4,5,0.2),rgba(4,4,5,0.84)_46%,rgba(4,4,5,0.96))]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent_160px)]" />
+      <MiniBeatPlayer />
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-16 px-6 pb-16 pt-6 font-['Spline_Sans',_sans-serif]">
-        <header className="sticky top-4 z-20 flex flex-wrap items-center justify-between gap-4 rounded-full border border-white/10 bg-[#0b0d10]/75 px-5 py-4 backdrop-blur">
-          <div className="flex items-center gap-3 font-semibold">
-            <span className="grid h-9 w-9 place-items-center rounded-[10px] border border-[#7ad0ff]/30 bg-[#7ad0ff]/10 text-lg font-bold text-[#7ad0ff]">
-              N
-            </span>
-            <span>Nand</span>
-          </div>
-          <nav className="flex flex-wrap items-center justify-center gap-4 text-sm text-white/60">
-            <a className="transition hover:text-white" href="#projects">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1120px] flex-col px-6 pb-10 pt-6 md:px-10 md:pb-14 md:pt-8">
+        <header className="intro-reveal stagger-1 flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-5">
+          <a
+            href="#top"
+            className="font-['Instrument_Serif',_serif] text-[1.6rem] italic tracking-[0.02em] text-primary"
+          >
+            Nand
+          </a>
+
+          <nav
+            aria-label="Primary"
+            className="flex flex-wrap items-center gap-5 text-[0.78rem] uppercase tracking-[0.22em] text-primary/54"
+          >
+            <a href="#projects" className="transition hover:text-primary">
               Projects
             </a>
-            <a className="transition hover:text-white" href="#stack">
-              Tech Stack
-            </a>
-            <a className="transition hover:text-white" href="#about">
+            <a href="#about" className="transition hover:text-primary">
               About
             </a>
+            <a href={links.github} target="_blank" rel="noreferrer" className="transition hover:text-primary">
+              GitHub
+            </a>
+            <a href={links.linkedin} target="_blank" rel="noreferrer" className="transition hover:text-primary">
+              LinkedIn
+            </a>
           </nav>
-          <button type="button" className={ghostButton} onClick={() => setPaletteOpen(true)}>
-            Command
-          </button>
         </header>
 
-        <section className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <div className="grid gap-5">
-            <p className="text-xs uppercase tracking-[0.25em] text-white/50">
-              Portfolio
-            </p>
-            <h1 className="font-['Space_Grotesk',_sans-serif] text-[clamp(2.4rem,5vw,3.6rem)] leading-tight text-white">
-              I design and build interface systems with a focus on clarity,
-              rhythm, and reliable UX.
-            </h1>
-            <p className="max-w-xl text-base leading-relaxed text-white/70">
-              A curated collection of product work, experiments, and systems that
-              scale from first sketch to production UI.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <a className={primaryButton} href="#projects">
-                View Projects
-              </a>
-              <button
-                type="button"
-                className={ghostButton}
-                onClick={() => setPaletteOpen(true)}
-              >
-                Open Command Palette
-              </button>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <p className="mb-2 text-[11px] uppercase tracking-[0.12em] text-white/50">
-                  Based in
-                </p>
-                <p className="text-sm text-white/80">Chicago / Remote</p>
-              </div>
-              <div>
-                <p className="mb-2 text-[11px] uppercase tracking-[0.12em] text-white/50">
-                  Focus
-                </p>
-                <p className="text-sm text-white/80">Product UI Systems</p>
-              </div>
-              <div>
-                <p className="mb-2 text-[11px] uppercase tracking-[0.12em] text-white/50">
-                  Currently
-                </p>
-                <p className="text-sm text-white/80">Exploring systems & motion</p>
-              </div>
-            </div>
-          </div>
+        <main id="top" className="flex flex-1 flex-col gap-[4.5rem] pt-12 md:gap-24 md:pt-[4.5rem]">
+          <section className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:gap-14">
+            <div className="intro-reveal stagger-2 flex flex-col gap-8">
+              <SectionLabel>Software Engineer Portfolio</SectionLabel>
 
-          <div className="h-[440px] w-full rounded-[20px] border border-[#7ad0ff]/20 bg-white/5 p-5 shadow-[0_40px_90px_rgba(0,0,0,0.45)] backdrop-blur">
-            <ChromaGrid items={chromaItems} columns={2} className="h-full" />
-          </div>
-        </section>
+              <div className="grid gap-6">
+                <h1 className="max-w-[11ch] text-balance text-5xl font-medium leading-[0.94] tracking-[-0.05em] text-primary md:text-7xl">
+                  Nand Thaker
+                </h1>
+                <p className="max-w-[30rem] text-balance text-lg leading-8 text-primary/74 md:text-[1.35rem] md:leading-9">
+                  I build full-stack systems that feel quiet, fast, and dependable.
+                </p>
+              </div>
 
-        <section className="grid gap-6" id="projects">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/50">
-                Selected Work
+              <p className="max-w-[38rem] text-base leading-8 text-primary/58">
+                Computer Science student at the University of Windsor, focused on backend-heavy products,
+                thoughtful frontends, and the details that make software hold together.
               </p>
-              <h2 className="font-['Space_Grotesk',_sans-serif] text-[clamp(1.8rem,3vw,2.5rem)] text-white">
-                Projects with system-level thinking.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-white/70">
-              Add your own case studies below. The template card shows the layout
-              and fields to fill in.
-            </p>
-          </div>
-          {projects.length === 0 ? (
-            <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)]">
-              <ProjectCard project={projectTemplate} onOpen={() => {}} disabled label="Template" />
-              <div className="grid gap-3 rounded-2xl border border-[#7ad0ff]/30 bg-white/5 p-5">
-                <p className="text-[11px] uppercase tracking-[0.12em] text-white/50">
-                  Add your work
-                </p>
-                <p className="text-sm text-white/70">
-                  Edit the <span className="rounded-lg bg-[#7ad0ff]/15 px-2 py-0.5 text-white">projects</span> array
-                  in <span className="rounded-lg bg-[#7ad0ff]/15 px-2 py-0.5 text-white">src/App.jsx</span> to add your
-                  real projects.
-                </p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <a href="#projects" className="action-chip action-chip-primary">
+                  View projects
+                </a>
+                <a href={`mailto:${links.email}`} className="action-chip">
+                  thaker31@uwindsor.ca
+                </a>
               </div>
             </div>
-          ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {projects.map((project) => (
+
+            <InfoPanel />
+          </section>
+
+          <div className="hairline intro-reveal stagger-3" />
+
+          <section id="projects" className="grid gap-8 md:gap-10">
+            <div className="intro-reveal stagger-1 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="grid gap-3">
+                <SectionLabel>Selected Projects</SectionLabel>
+                <h2 className="max-w-[14ch] text-balance text-3xl font-medium tracking-[-0.04em] text-primary md:text-5xl">
+                  Work that carries its own weight.
+                </h2>
+              </div>
+
+              <p className="max-w-[32rem] text-sm leading-7 text-primary/56 md:text-right">
+                Production-minded full-stack work, small enough to scan quickly and dense enough to prove how I think.
+              </p>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {projects.map((project, index) => (
                 <ProjectCard
-                  key={project.id ?? project.title}
+                  key={project.id}
                   project={project}
-                  onOpen={setSelectedProject}
+                  className={project.featured ? 'md:col-span-2' : ''}
+                  delayClass={`stagger-${Math.min(index + 1, 4)}`}
                 />
               ))}
             </div>
-          )}
-        </section>
+          </section>
 
-        <section className="grid gap-6 rounded-[20px] border border-[#7ad0ff]/20 bg-white/5 p-10 shadow-[0_40px_90px_rgba(0,0,0,0.45)] backdrop-blur" id="stack">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/50">
-                Toolbox
-              </p>
-              <h2 className="font-['Space_Grotesk',_sans-serif] text-[clamp(1.8rem,3vw,2.5rem)] text-white">
-                Tech stack and frameworks.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-white/70">
-              A quick snapshot of the tools, frameworks, and platforms I reach for
-              when building production UI.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {techStack.map((group) => (
-              <div
-                className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-5"
-                key={group.category}
-              >
-                <p className="text-[11px] uppercase tracking-[0.12em] text-white/50">
-                  {group.category}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {group.items.map((item) => (
-                    <Badge key={item} label={item} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+          <div className="hairline" />
 
-        <section className="grid gap-6 rounded-[20px] border border-[#7ad0ff]/20 bg-white/5 p-10 shadow-[0_40px_90px_rgba(0,0,0,0.45)] backdrop-blur" id="about">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/50">
-                About
-              </p>
-              <h2 className="font-['Space_Grotesk',_sans-serif] text-[clamp(1.8rem,3vw,2.5rem)] text-white">
-                Quietly obsessive about detail.
+          <section id="about" className="grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-12">
+            <div className="intro-reveal stagger-1 grid gap-5">
+              <SectionLabel>About</SectionLabel>
+              <h2 className="max-w-[12ch] text-balance text-3xl font-medium tracking-[-0.04em] text-primary md:text-5xl">
+                Calm surface, serious internals.
               </h2>
-            </div>
-            <p className="max-w-sm text-sm text-white/70">
-              I build product UIs that scale across teams. My work pairs visual
-              restraint with clear interaction logic so complexity feels calm.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
-            <div className="grid gap-4 text-sm text-white/70">
-              <p>
-                I am a frontend engineer focused on systems, interaction design,
-                and component architecture. I have led UI foundations for
-                cross-functional teams, shipping experiences that prioritize
-                clarity under pressure.
-              </p>
-              <p>
-                My approach is deliberate: I map constraints first, then translate
-                them into a visual language that is consistent and resilient.
-              </p>
-              <p>
-                Outside of work I explore generative typography, hardware
-                controls, and new ways to make software feel humane.
+              <p className="max-w-[38rem] text-base leading-8 text-primary/62">
+                I care about software that reads clearly and fails predictably. Most of my work starts with the
+                system shape: data flow, constraints, and the edge cases that usually get ignored. Once the
+                structure is solid, I like making the interface feel as considered as the backend.
               </p>
             </div>
+
             <div className="grid gap-4">
-              {highlights.map((item) => (
-                <div
-                  className="grid gap-2 rounded-2xl border border-white/10 bg-[#0d1014]/80 p-4"
-                  key={item.label}
-                >
-                  <p className="text-[11px] uppercase tracking-[0.12em] text-white/50">
-                    {item.label}
-                  </p>
-                  <p className="text-sm text-white/70">{item.text}</p>
-                </div>
+              {principles.map((item, index) => (
+                <PrincipleCard key={item.title} item={item} delayClass={`stagger-${index + 2}`} />
               ))}
             </div>
-          </div>
-        </section>
+          </section>
+        </main>
 
-        <section className="grid gap-6" id="resume">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="mb-3 text-xs uppercase tracking-[0.2em] text-white/50">
-                Resume
-              </p>
-              <h2 className="font-['Space_Grotesk',_sans-serif] text-[clamp(1.8rem,3vw,2.5rem)] text-white">
-                Resume snapshot.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-white/70">
-              A concise overview of experience, scope, and technical depth.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-[20px] border border-white/10 bg-[#0d1014]/80 p-6">
-            <div>
-              <p className="mb-2 text-[11px] uppercase tracking-[0.12em] text-white/50">
-                PDF
-              </p>
-              <p className="text-sm text-white/70">Updated January 2026</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a className={primaryButton} href="/resume.pdf" download>
-                Download Resume
-              </a>
-            </div>
-          </div>
-        </section>
+        <footer className="mt-16 flex flex-col gap-5 border-t border-white/8 pt-6 text-sm text-primary/50 md:mt-20 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-[32rem] leading-7">
+            Open to software engineering internships and projects where reliability matters as much as speed.
+          </p>
 
-        <footer className="grid gap-2 pb-8 text-center text-xs text-white/50">
-          <p>Designed for clarity. Built with restraint.</p>
-          <p>(c) 2026 Nand Thaker. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-5">
+            <a href={links.github} target="_blank" rel="noreferrer" className="transition hover:text-primary">
+              GitHub
+            </a>
+            <a href={links.linkedin} target="_blank" rel="noreferrer" className="transition hover:text-primary">
+              LinkedIn
+            </a>
+            <a href={`mailto:${links.email}`} className="transition hover:text-primary">
+              Email
+            </a>
+          </div>
         </footer>
       </div>
     </div>
