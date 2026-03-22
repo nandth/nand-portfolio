@@ -342,7 +342,7 @@ function MiniBeatPlayer() {
           className="beat-player__reopen"
           onClick={() => { setIsClosed(false); setWindowMode('default'); }}
         >
-          Beats 🎶
+          🎶
         </button>
       ) : (
         <aside
