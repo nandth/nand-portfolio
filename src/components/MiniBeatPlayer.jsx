@@ -69,7 +69,7 @@ function MiniBeatPlayer() {
   const [duration,     setDuration]    = useState(0);
   const [volume,       setVolume]      = useState(0.7);
   const [windowMode,   setWindowMode]  = useState('default');
-  const [isClosed,     setIsClosed]    = useState(false);
+  const [isClosed,     setIsClosed]    = useState(true);
 
   if (!tracks.length) return null;
   const activeTrack = tracks[trackIndex];
