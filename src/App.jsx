@@ -290,7 +290,7 @@ function NavLink({ href, children, tooltip, external = false }) {
 
 // ─── ProjectCard ───────────────────────────────────────────────────────────
 
-function ProjectLinks({ project }) {
+function ProjectLinks({ project, onAnalytics }) {
   return (
     <div className="mt-auto flex flex-wrap gap-5 pt-8 text-sm text-primary/65">
       <a
@@ -311,11 +311,20 @@ function ProjectLinks({ project }) {
           Live demo <span aria-hidden="true">/</span>
         </a>
       )}
+      {onAnalytics && (
+        <button
+          type="button"
+          onClick={onAnalytics}
+          className="inline-flex items-center gap-2 transition hover:text-primary"
+        >
+          Analytics <span aria-hidden="true">/</span>
+        </button>
+      )}
     </div>
   );
 }
 
-function ProjectCard({ project, className = '', delay = 0 }) {
+function ProjectCard({ project, className = '', delay = 0, onAnalytics }) {
   const [ref, on] = useReveal(0.07);
   const isFeatured = project.featured;
 
@@ -343,7 +352,7 @@ function ProjectCard({ project, className = '', delay = 0 }) {
             <div className="mt-6 flex flex-wrap gap-1.5">
               {project.stack.map((tech) => <StackBadge key={tech} tech={tech} />)}
             </div>
-            <ProjectLinks project={project} />
+            <ProjectLinks project={project} onAnalytics={onAnalytics} />
           </div>
           <div className="hidden shrink-0 overflow-hidden rounded-xl border border-white/8 md:flex md:w-[46%]">
             <img
@@ -369,7 +378,7 @@ function ProjectCard({ project, className = '', delay = 0 }) {
           <div className="mt-6 flex flex-wrap gap-1.5">
             {project.stack.map((tech) => <StackBadge key={tech} tech={tech} />)}
           </div>
-          <ProjectLinks project={project} />
+          <ProjectLinks project={project} onAnalytics={onAnalytics} />
         </>
       )}
     </article>
@@ -469,14 +478,7 @@ function App() {
                 Resume
               </button>
               <a href="#projects" className="transition hover:text-primary">Projects</a>
-              <button
-                type="button"
-                onClick={() => setAnalyticsOpen(true)}
-                className="transition hover:text-primary"
-              >
-                Analytics
-              </button>
-<NavLink href={links.github} tooltip="github.com/nandth" external>GitHub</NavLink>
+              <NavLink href={links.github} tooltip="github.com/nandth" external>GitHub</NavLink>
               <NavLink href={links.linkedin} tooltip="linkedin.com/in/nand-thaker" external>LinkedIn</NavLink>
               <ThemeButton onClick={toggleTheme} isLight={isLight} />
             </nav>
@@ -569,6 +571,7 @@ function App() {
                     project={project}
                     className={project.featured ? 'md:col-span-2' : ''}
                     delay={index * 75}
+                    onAnalytics={project.featured ? () => setAnalyticsOpen(true) : undefined}
                   />
                 ))}
               </div>
