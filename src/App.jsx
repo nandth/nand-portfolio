@@ -6,6 +6,7 @@ import TechMatrix from './components/TechMatrix';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import modelRouterImg from './assets/model-router.png';
+import AnalyticsModal from './components/AnalyticsModal';
 
 // ─── data ──────────────────────────────────────────────────────────────────
 
@@ -382,6 +383,7 @@ const BG_SPEED = 255 / 20; // faster black/white toggle
 function App() {
   const scrolled = useScrolled(50);
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   // bgVal: 0 = black, 255 = white
   const [bgVal, setBgVal] = useState(0);
@@ -430,6 +432,7 @@ function App() {
       >
         <ScrollProgress />
         <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
+        <AnalyticsModal open={analyticsOpen} onClose={() => setAnalyticsOpen(false)} />
 
         {/* ── Galaxy background (full-screen, fixed) ─────────────────── */}
 
@@ -466,6 +469,13 @@ function App() {
                 Resume
               </button>
               <a href="#projects" className="transition hover:text-primary">Projects</a>
+              <button
+                type="button"
+                onClick={() => setAnalyticsOpen(true)}
+                className="transition hover:text-primary"
+              >
+                Analytics
+              </button>
 <NavLink href={links.github} tooltip="github.com/nandth" external>GitHub</NavLink>
               <NavLink href={links.linkedin} tooltip="linkedin.com/in/nand-thaker" external>LinkedIn</NavLink>
               <ThemeButton onClick={toggleTheme} isLight={isLight} />
